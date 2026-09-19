@@ -17,6 +17,8 @@ export interface JSDocMeta {
   bodyDescription?: string
   /** Generic parameters from `@param` tags (project-agnostic). */
   params?: ParsedParam[]
+  /** Examples keyed by param name, from `@paramExample` tags. */
+  paramExamples?: Record<string, unknown>
   deprecated?: boolean
   operationId?: string
   security?: string[]
@@ -112,6 +114,7 @@ export function parseParam(value: string): ParsedParam | undefined {
  *   `@bodyDescription` ... (requestBody.description)
  *   `@param` header x-request-id optional Idempotency key
  *   `@param` query limit:number required Max items
+ *   `@paramExample` x-request-id req_9f2c4a1e
  *   `@security` bearerAuth | `@security` a, b
  *   `@response` 200 { ... } | `@response` 409 Email already exists
  *   `@example` { ... }
@@ -159,6 +162,21 @@ export function parseJSDoc(code: string): JSDocMeta {
         if (param) {
           meta.params ??= []
           meta.params.push(param)
+        }
+        break
+      }
+      case 'paramExample':
+      case 'paramexample':
+      case 'paramExamples':
+      case 'paramexamples': {
+        const gap = value.indexOf(' ')
+        if (gap > 0) {
+          const name = value.slice(0, gap).trim()
+          const rest = value.slice(gap + 1).trim()
+          if (name && rest) {
+            meta.paramExamples ??= {}
+            meta.paramExamples[name] = tryJSON(rest)
+          }
         }
         break
       }

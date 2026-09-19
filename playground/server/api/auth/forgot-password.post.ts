@@ -4,6 +4,7 @@
  * @description Send a reset email if the address exists (max 5/min per IP).
  * @bodyDescription Password-reset request payload.
  * @param header x-request-id optional Idempotency key for safe retries
+ * @paramExample x-request-id req_9f2c4a1e
  * @response 200 { "ok": true }
  * @response 429 Too many requests
  * @example { "email": "student@fpt.edu.vn" }

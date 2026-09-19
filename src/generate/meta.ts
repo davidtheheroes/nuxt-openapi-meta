@@ -241,6 +241,22 @@ export function buildOpenAPI({ id, routesDir, jsdoc, openAPIMeta, schemas, optio
   if (Array.isArray(meta.parameters))
     applyParams(meta.parameters as Array<Record<string, unknown>>)
 
+  // `@paramExample <name> <value>` (+ `openAPIMeta.paramExamples`) attaches
+  // `example` to every parameter with that name. Explicit `example` on the
+  // parameter object itself always wins.
+  const paramExamples = {
+    ...(jsdoc.paramExamples ?? {}),
+    ...((meta.paramExamples as Record<string, unknown> | undefined) ?? {}),
+  }
+  if (Object.keys(paramExamples).length) {
+    for (const p of parameters) {
+      if (typeof p.name === 'string'
+        && p.example === undefined
+        && paramExamples[p.name] !== undefined)
+        p.example = paramExamples[p.name]
+    }
+  }
+
   // Request body (only meaningful for mutating verbs; the schema may be any
   // JSON Schema — object, array, primitive).
   // Example precedence: openAPIMeta.example > `bodyExample` export > `@example`.

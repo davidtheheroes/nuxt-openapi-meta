@@ -37,6 +37,11 @@ export default defineEventHandler(() => ({}))`
     expect(meta.tags).toEqual(['Auth', 'Users'])
     expect(meta.deprecated).toBe(true)
   })
+
+  it('parses @paramExample values (string and JSON)', () => {
+    const meta = parseJSDoc(`/**\n * @param header x-id optional Some id\n * @paramExample x-id req_123\n * @paramExample limit 10\n */\nexport default 1`)
+    expect(meta.paramExamples).toEqual({ 'x-id': 'req_123', 'limit': 10 })
+  })
 })
 
 describe('parseParam', () => {

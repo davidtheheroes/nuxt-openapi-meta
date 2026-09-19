@@ -197,6 +197,28 @@ describe('buildOpenAPI', () => {
     expect(body.content).toBeDefined()
   })
 
+  it('attaches @paramExample to parameters without overriding explicit examples', () => {
+    const { openAPI } = buildOpenAPI({
+      id: '/app/server/api/auth/forgot-password.post.ts',
+      routesDir: '/app/server/api',
+      jsdoc: {
+        params: [
+          { name: 'x-request-id', in: 'header', required: false, schema: { type: 'string' } },
+          { name: 'x-trace', in: 'header', required: false, schema: { type: 'string' } },
+        ],
+        paramExamples: { 'x-request-id': 'req_123', 'x-trace': 'ignored' },
+      },
+      openAPIMeta: {
+        parameters: [{ name: 'x-trace', in: 'header', example: 'explicit' }],
+      },
+      schemas: {},
+      options: {},
+    })
+    const params = openAPI.parameters as Array<{ name: string, example?: unknown }>
+    expect(params.find(p => p.name === 'x-request-id')?.example).toBe('req_123')
+    expect(params.find(p => p.name === 'x-trace')?.example).toBe('explicit')
+  })
+
   it('enriches nested path params from paramsSchema', () => {
     const { openAPI } = buildOpenAPI({
       id: '/app/server/api/roles/[id]/permissions/[permissionId].delete.ts',

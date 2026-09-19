@@ -84,6 +84,7 @@ Your handler source files are never modified.
 | `@summary` / `@description` | Operation summary/description |
 | `@bodyDescription …` | `requestBody.description` |
 | `@param <in> <name>[:type] [required\|optional] [desc…]` | Generic parameter — see below |
+| `@paramExample <name> <value>` | Example for the named parameter (JSON or plain text) |
 | `@operationId` | Explicit operationId |
 | `@deprecated` | Mark deprecated |
 | `@security bearerAuth` | `security: [{ bearerAuth: [] }]` |
@@ -103,6 +104,8 @@ hardcoded custom headers.
  * @param query limit:number required Max items (1-100)
  * @param query include Comma-separated relations to include
  * @param path id The user id
+ * @paramExample x-request-id req_9f2c4a1e
+ * @paramExample limit 25
  */
 ```
 

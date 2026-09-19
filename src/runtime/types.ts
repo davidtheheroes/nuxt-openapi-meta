@@ -16,6 +16,8 @@ export interface OpenAPIMetaOverride {
   example?: unknown
   responses?: Record<number | string, unknown>
   parameters?: Array<Record<string, unknown>>
+  /** Examples keyed by parameter name (`@paramExample` equivalent). */
+  paramExamples?: Record<string, unknown>
   requestBody?: Record<string, unknown>
 }
 
