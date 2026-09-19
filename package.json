@@ -1,6 +1,6 @@
 {
   "name": "nuxt-openapi-meta",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "author": "David",
   "description": "Auto-generate Nitro defineRouteMeta (OpenAPI) for Nuxt server routes from JSDoc + Zod/Valibot schemas",
   "keywords": [
