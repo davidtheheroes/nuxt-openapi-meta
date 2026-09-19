@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 Releases after `v0.1.0` are generated with [changelogen](https://github.com/unjs/changelogen)
 from [Conventional Commits](https://www.conventionalcommits.org/).
 
+## v0.1.1
+
 ## v0.1.0 (unreleased)
 
 ### Features

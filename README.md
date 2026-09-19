@@ -1,9 +1,6 @@
 # nuxt-openapi-meta
 
-[![npm version][npm-version-src]][npm-version-href]
-[![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![License][license-src]][license-href]
-[![Nuxt][nuxt-src]][nuxt-href]
+[![npm version][npm-version-src]][npm-version-href] [![npm downloads][npm-downloads-src]][npm-downloads-href] [![License][license-src]][license-href] [![Nuxt][nuxt-src]][nuxt-href]
 
 Auto-generate Nitro `defineRouteMeta` (OpenAPI) for Nuxt server routes from **JSDoc annotations** + **Zod / Valibot schemas**. Zero boilerplate: just write a route, get documented OpenAPI.
 
@@ -16,7 +13,7 @@ Auto-generate Nitro `defineRouteMeta` (OpenAPI) for Nuxt server routes from **JS
 - 🧪 `export const bodySchema / querySchema / paramsSchema / responseSchema` (Zod v3/v4, Valibot) → JSON Schema
 - ⚡ Serves generated `defineRouteMeta` through Nitro's `?meta` pipeline (no source files touched)
 - 🛡 Respects existing `defineRouteMeta` (skip unless `overwrite: true`)
-- ⚙️ `tagMap`, `defaultErrors`, `createError()` auto-detect, header params for CSRF/Turnstile
+- ⚙️ `tagMap`, `defaultErrors`, `createError()` auto-detect, generic `@param` support
 
 ## Quick Setup
 
@@ -303,13 +300,13 @@ Your support motivates me to keep building and maintaining open-source projects!
 </p>
 
 <!-- Badges -->
-[npm-version-src]: https://img.shields.io/npm/v/nuxt-openapi-meta/latest.svg?style=flat&colorA=020420&colorB=00DC82
+[npm-version-src]: https://img.shields.io/npm/v/nuxt-openapi-meta/latest.svg?style=flat&colorA=020420&colorB=00DC82&cacheSeconds=86400
 [npm-version-href]: https://npmjs.com/package/nuxt-openapi-meta
 
-[npm-downloads-src]: https://img.shields.io/npm/dm/nuxt-openapi-meta.svg?style=flat&colorA=020420&colorB=00DC82
+[npm-downloads-src]: https://img.shields.io/npm/dm/nuxt-openapi-meta.svg?style=flat&colorA=020420&colorB=00DC82&cacheSeconds=86400
 [npm-downloads-href]: https://npm.chart.dev/nuxt-openapi-meta
 
-[license-src]: https://img.shields.io/npm/l/nuxt-openapi-meta.svg?style=flat&colorA=020420&colorB=00DC82
+[license-src]: https://img.shields.io/npm/l/nuxt-openapi-meta.svg?style=flat&colorA=020420&colorB=00DC82&cacheSeconds=86400
 [license-href]: https://npmjs.com/package/nuxt-openapi-meta
 
 [nuxt-src]: https://img.shields.io/badge/Nuxt-020420?logo=nuxt
