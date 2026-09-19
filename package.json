@@ -1,0 +1,91 @@
+{
+  "name": "nuxt-openapi-meta",
+  "version": "0.1.0",
+  "author": "David",
+  "description": "Auto-generate Nitro defineRouteMeta (OpenAPI) for Nuxt server routes from JSDoc + Zod/Valibot schemas",
+  "keywords": [
+    "nuxt",
+    "nuxt-module",
+    "nuxt3",
+    "nuxt4",
+    "nitro",
+    "openapi",
+    "scalar",
+    "swagger",
+    "defineRouteMeta",
+    "zod",
+    "valibot"
+  ],
+  "repository": "davidtheheroes/nuxt-openapi-meta",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.mts",
+      "import": "./dist/module.mjs"
+    }
+  },
+  "main": "./dist/module.mjs",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/types.d.mts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "workspaces": [
+    "playground"
+  ],
+  "scripts": {
+    "prepack": "nuxt-module-build build",
+    "dev": "npm run dev:prepare && nuxt dev playground",
+    "dev:build": "nuxt build playground",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxt prepare playground",
+    "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^4.5.2",
+    "@valibot/to-json-schema": "^1.8.0",
+    "jiti": "^2.7.0",
+    "pathe": "^2.0.3",
+    "zod-to-json-schema": "^3.25.2"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "^3.4.2",
+    "@nuxt/eslint-config": "^1.17.0",
+    "@nuxt/module-builder": "^1.0.3",
+    "@nuxt/schema": "^4.5.2",
+    "@nuxt/test-utils": "^4.3.2",
+    "@types/node": "latest",
+    "changelogen": "^0.6.2",
+    "eslint": "^10.10.0",
+    "nuxt": "^4.5.2",
+    "typescript": "^6.0.3",
+    "valibot": "^1.5.0",
+    "vitest": "^4.1.11",
+    "vue-tsc": "^3.3.11",
+    "zod": "^4.6.5"
+  },
+  "peerDependencies": {
+    "zod": "^3.25 || ^4.0.0",
+    "valibot": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    },
+    "valibot": {
+      "optional": true
+    }
+  }
+}

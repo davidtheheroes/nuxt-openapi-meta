@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "nuxt-openapi-meta-playground",
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "nuxt": "^4.5.2",
+    "nuxt-openapi-meta": "file:..",
+    "valibot": "^1.5.0",
+    "zod": "^4.6.5"
+  }
+}
