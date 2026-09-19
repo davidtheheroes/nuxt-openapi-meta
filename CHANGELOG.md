@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 Releases after `v0.1.0` are generated with [changelogen](https://github.com/unjs/changelogen)
 from [Conventional Commits](https://www.conventionalcommits.org/).
 
+## v0.2.1
+
+[compare changes](https://github.com/davidtheheroes/nuxt-openapi-meta/compare/v0.2.0...v0.2.1)
+
 ## v0.1.2
 
 
