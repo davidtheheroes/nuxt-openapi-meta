@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 Releases after `v0.1.0` are generated with [changelogen](https://github.com/unjs/changelogen)
 from [Conventional Commits](https://www.conventionalcommits.org/).
 
+## v0.1.2
+
+
+### 🏡 Chore
+
+- **release:** V0.1.1 ([d0f8262](https://github.com/davidtheheroes/nuxt-openapi-meta/commit/d0f8262))
+
+### ❤️ Contributors
+
+- David Pham ([@davidtheheroes](https://github.com/davidtheheroes))
+
 ## v0.1.1
 
 ## v0.1.0 (unreleased)
