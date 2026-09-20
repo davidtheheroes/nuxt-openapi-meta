@@ -307,9 +307,68 @@ export function buildOpenAPI({ id, routesDir, jsdoc, openAPIMeta, schemas, optio
     responses,
   }
 
-  const security = (meta.security ?? jsdoc.security) as string[] | undefined
+  // `auth: true | {…}` shorthand → default Bearer scheme + default security.
+  // Explicit `security` / `securitySchemes` always win over the shorthand.
+  // `mode` toggles the UIs' automatic `Bearer ` prefix: `bearer` (default)
+  // lets Swagger/Scalar prepend it, `apiKey` leaves the raw header value
+  // for the user to type by hand.
+  const authCfg = options.auth === true ? {} : (options.auth as Record<string, unknown> | undefined)
+  const authName = (authCfg?.name as string | undefined) ?? 'bearerAuth'
+  const authMode = (authCfg?.mode as string | undefined) === 'apiKey' ? 'apiKey' : 'bearer'
+  const authScheme = authCfg
+    ? authMode === 'apiKey'
+      ? {
+          type: 'apiKey',
+          in: 'header',
+          name: 'Authorization',
+          // NOTE: no `<token>` here — Swagger/Scalar render descriptions
+          // as HTML and strip anything looking like a tag.
+          description: (authCfg.description as string | undefined) ?? 'Enter the full header value, e.g. Bearer {token}',
+        }
+      : {
+          type: 'http',
+          scheme: 'bearer',
+          description: (authCfg.description as string | undefined) ?? 'Paste the raw JWT token — "Bearer" is added automatically',
+        }
+    : undefined
+  const effectiveSecurity = options.security ?? (authScheme ? [authName] : undefined)
+  const explicitSchemes = (options.securitySchemes ?? {}) as Record<string, unknown>
+  const effectiveSchemes: Record<string, unknown> = authScheme
+    ? {
+        ...explicitSchemes,
+        [authName]: {
+          ...authScheme,
+          ...((explicitSchemes[authName] as Record<string, unknown> | undefined) ?? {}),
+        },
+      }
+    : explicitSchemes
+
+  const security = (meta.security ?? jsdoc.security ?? effectiveSecurity) as string[] | undefined
   if (security?.length)
     openAPI.security = security.map(s => ({ [s]: [] }))
+
+  // Global fragments hoisted by Nitro to the top-level doc.
+  // `securitySchemes` (global option or per-route shorthand) becomes
+  // `$global.components.securitySchemes` — without it Swagger/Scalar
+  // never show the Authorize button even when `security` is set.
+  const metaGlobal = (meta.$global as Record<string, unknown> | undefined) ?? {}
+  const metaComponents = (metaGlobal.components as Record<string, unknown> | undefined) ?? {}
+  const metaSchemes = (metaComponents.securitySchemes as Record<string, unknown> | undefined) ?? {}
+  const routeSchemes = (meta.securitySchemes as Record<string, unknown> | undefined) ?? {}
+  const mergedSchemes = {
+    ...effectiveSchemes,
+    ...metaSchemes,
+    ...routeSchemes,
+  }
+  const $global: Record<string, unknown> = { ...metaGlobal }
+  if (Object.keys(mergedSchemes).length) {
+    $global.components = {
+      ...metaComponents,
+      securitySchemes: mergedSchemes,
+    }
+  }
+  if (Object.keys($global).length)
+    openAPI.$global = $global
 
   return { openAPI }
 }

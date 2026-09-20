@@ -13,6 +13,17 @@ export interface OpenAPIMetaOverride {
   operationId?: string
   deprecated?: boolean
   security?: string[]
+  /**
+   * Shorthand for per-route `components.securitySchemes`.
+   * Merged into `$global.components.securitySchemes` (over global config).
+   */
+  securitySchemes?: Record<string, unknown>
+  /**
+   * Raw global fragment hoisted by Nitro to the top-level OpenAPI doc,
+   * e.g. `{ components: { securitySchemes: { bearerAuth: {...} } } }`.
+   * Deep-merged under the module's global `securitySchemes` option.
+   */
+  $global?: Record<string, unknown>
   example?: unknown
   responses?: Record<number | string, unknown>
   parameters?: Array<Record<string, unknown>>

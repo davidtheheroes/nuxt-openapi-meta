@@ -14,6 +14,7 @@ Auto-generate Nitro `defineRouteMeta` (OpenAPI) for Nuxt server routes from **JS
 - ⚡ Serves generated `defineRouteMeta` through Nitro's `?meta` pipeline (no source files touched)
 - 🛡 Respects existing `defineRouteMeta` (skip unless `overwrite: true`)
 - ⚙️ `tagMap`, `defaultErrors`, `createError()` auto-detect, generic `@param` support
+- 🔐 JWT/Bearer auth: global `securitySchemes` + `security` with per-route override (Swagger/Scalar Authorize button)
 
 ## Quick Setup
 
@@ -87,7 +88,7 @@ Your handler source files are never modified.
 | `@paramExample <name> <value>` | Example for the named parameter (JSON or plain text) |
 | `@operationId` | Explicit operationId |
 | `@deprecated` | Mark deprecated |
-| `@security bearerAuth` | `security: [{ bearerAuth: [] }]` |
+| `@security bearerAuth` | `security: [{ bearerAuth: [] }]` (needs `securitySchemes` below or no Authorize button shows) |
 | `@response 200 { … }` | Success example (JSON object) |
 | `@response 404 Not found` | Error description — stack one line per status |
 | `@example { … }` | Request-body example (inline JSON) |
@@ -228,6 +229,129 @@ Supported validators (latest versions):
 - `zod` v3 — via `zod-to-json-schema`
 - `valibot` v1 — via `@valibot/to-json-schema`
 
+### Authentication (JWT / Bearer)
+
+Swagger/Scalar only show the Authorize button when the spec defines **both**:
+1. `components.securitySchemes` (what auth exists) and
+2. `security` on an operation (which routes require it).
+
+Enable it globally — shortest way, auto-adds Bearer:
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['nuxt-openapi-meta'],
+  openapiMeta: {
+    tagMap: { '/api/auth': 'Auth' },
+    auth: true, // = bearerAuth scheme + security: ['bearerAuth'] for every route
+  },
+  nitro: {
+    experimental: { openAPI: true },
+  },
+})
+```
+
+Customize the hint text / scheme name:
+
+```ts
+openapiMeta: {
+  auth: {
+    description: 'Paste the raw JWT token — "Bearer" is added automatically', // default, override to localize
+    // name: 'jwt', // default 'bearerAuth'
+    // mode: 'bearer', // default 'bearer' — see toggle below
+  },
+}
+```
+
+Toggle the automatic `Bearer ` prefix (`auth.mode`, optional, default `'bearer'`):
+
+| `mode` | Spec emitted | UX |
+|---|---|---|
+| `'bearer'` | `type: http, scheme: bearer` | Swagger/Scalar prepend `Bearer ` automatically — user pastes the raw JWT only |
+| `'apiKey'` | `type: apiKey, in: header, name: Authorization` | No auto-prefix — user types the full header value by hand, e.g. `Bearer {token}` |
+
+Omit `auth` (or set `auth: false`) to disable auth entirely.
+
+> ℹ️ Users only paste the raw JWT — Swagger/Scalar prepend `Bearer ` to the
+> `Authorization` header automatically because the scheme is
+> `type: http, scheme: bearer` (per the OpenAPI standard). Only the legacy
+> `type: apiKey` style forces users to type the `Bearer ` prefix by hand.
+
+Or spell it out manually (explicit config always wins over `auth`):
+
+```ts
+openapiMeta: {
+    securitySchemes: {
+      bearerAuth: { type: 'http', scheme: 'bearer' },
+    },
+  security: ['bearerAuth'], // default for every route
+}
+```
+
+The module injects `securitySchemes` via Nitro's `$global.components.securitySchemes`
+into every generated `?meta`, so `/_openapi.json` carries it and the UIs render Authorize.
+
+Per-route override (wins over global):
+
+```ts
+// server/api/me.get.ts — protected
+/**
+ * @security bearerAuth
+ */
+
+// server/api/auth/login.post.ts — public, opt out of the global default
+import { defineOpenAPIMeta } from 'nuxt-openapi-meta/dist/runtime/utils'
+
+export const openAPIMeta = defineOpenAPIMeta({
+  security: [],
+})
+```
+
+Advanced: `openAPIMeta.securitySchemes` merges over the global one for that route,
+and `openAPIMeta.$global` passes through to Nitro (e.g. extra `components.schemas`),
+deep-merged under the global `securitySchemes`.
+
+### More schemes besides `bearerAuth`
+
+`securitySchemes` is a free-form map — key names are yours to choose, one entry
+per auth method your API supports:
+
+```ts
+openapiMeta: {
+  securitySchemes: {
+    bearerAuth: { type: 'http', scheme: 'bearer' },
+    basicAuth: { type: 'http', scheme: 'basic' },
+    apiKey: { type: 'apiKey', in: 'header', name: 'X-API-Key' },
+    // apiKey can also live in query or cookies:
+    // sessionCookie: { type: 'apiKey', in: 'cookie', name: 'session' },
+    oauth2: {
+      type: 'oauth2',
+      flows: {
+        authorizationCode: {
+          authorizationUrl: 'https://example.com/oauth/authorize',
+          tokenUrl: 'https://example.com/oauth/token',
+          scopes: { read: 'Read access', write: 'Write access' },
+        },
+      },
+    },
+    oidc: {
+      type: 'openIdConnect',
+      openIdConnectUrl: 'https://example.com/.well-known/openid-configuration',
+    },
+  },
+  security: ['bearerAuth'], // global default; per-route `@security apiKey` overrides it
+}
+```
+
+Notes:
+
+* `security: ['bearerAuth', 'apiKey']` means **OR** (either one unlocks the route).
+  The `string[]` shorthand always emits empty scopes (`[{ name: [] }]`), which fits
+  HTTP/API-key schemes; for OAuth2 scopes per route, declare that route's own
+  `defineRouteMeta` instead.
+* The `auth: true` shorthand only covers the Bearer case — everything above needs
+  explicit `securitySchemes`.
+
 ### Manual override
 
 If a route file already contains `defineRouteMeta(...)`, the module skips it. Set `overwrite: true` to force regeneration.
@@ -243,6 +367,9 @@ export interface ModuleOptions {
   defaultErrors?: Array<{ status: number, description: string }>
   overwrite?: boolean // default false
   detectCreateError?: boolean // default true — parse createError({ statusCode })
+  securitySchemes?: Record<string, unknown> // e.g. { bearerAuth: { type: 'http', scheme: 'bearer' } }
+  security?: string[] // default security for every route, e.g. ['bearerAuth']
+  auth?: boolean | { name?: string, description?: string, mode?: 'bearer' | 'apiKey' } // optional shorthand, omit/false = off
 }
 ```
 

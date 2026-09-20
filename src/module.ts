@@ -8,6 +8,26 @@ export interface DefaultError {
   description: string
 }
 
+export interface AuthOptions {
+  /** Scheme name, default `'bearerAuth'`. */
+  name?: string
+  /**
+   * Scheme description shown in Swagger/Scalar.
+   * NOTE: Swagger/Scalar render descriptions as HTML — a literal `<token>`
+   * is treated as an HTML tag and stripped. Use `{token}` instead.
+   */
+  description?: string
+  /**
+   * Toggle who adds the `Bearer ` prefix (optional, default `'bearer'`):
+   * - `'bearer'`: `type: http, scheme: bearer` — Swagger/Scalar prepend
+   *   `Bearer ` automatically, the user pastes the raw JWT only.
+   * - `'apiKey'`: `type: apiKey, in: header, name: Authorization` — no
+   *   auto-prefix, the user types the full header value by hand
+   *   (e.g. `Bearer {token}`).
+   */
+  mode?: 'bearer' | 'apiKey'
+}
+
 export interface ModuleOptions {
   /**
    * Directory containing routes, default `server/api` (relative to rootDir or absolute).
@@ -26,6 +46,31 @@ export interface ModuleOptions {
   overwrite?: boolean
   /** Auto-detect `createError({ statusCode })` calls and add them to `responses` */
   detectCreateError?: boolean
+  /**
+   * Global `components.securitySchemes` injected via `$global` into every
+   * generated route meta. Required for Swagger/Scalar to show the
+   * Authorize button, e.g. `{ bearerAuth: { type: 'http', scheme: 'bearer' } }`.
+   */
+  securitySchemes?: Record<string, unknown>
+  /**
+   * Default `security` applied to every operation when the route itself
+   * doesn't define `@security` / `openAPIMeta.security`.
+   * E.g. `['bearerAuth']` → `security: [{ bearerAuth: [] }]`.
+   * Set per-route `security: []` (or `@security` empty) to mark a public route.
+   */
+  security?: string[]
+  /**
+   * Optional shorthand to auto-add a Bearer scheme + default security, so
+   * you don't have to spell out `securitySchemes`/`security` by hand.
+   * Omit it (or set `auth: false`) to disable auth entirely.
+   * - `auth: true` → `securitySchemes.bearerAuth = { type: 'http', scheme: 'bearer', description }`
+   *   and `security = ['bearerAuth']`.
+   * - `auth: { name, description, mode }` to customize.
+   *   `mode: 'apiKey'` turns OFF the UIs' automatic `Bearer ` prefix so the
+   *   user types the full header value manually.
+   * Explicit `security` / `securitySchemes` always win over this shorthand.
+   */
+  auth?: boolean | AuthOptions
   /**
    * Source code of the current file (set by transform).
    * @internal
