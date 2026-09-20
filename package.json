@@ -50,7 +50,7 @@
     "dev": "npm run dev:prepare && nuxt dev playground",
     "dev:build": "nuxt build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxt prepare playground",
-    "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "release": "npm run lint && npm run test && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest watch",
@@ -58,10 +58,8 @@
   },
   "dependencies": {
     "@nuxt/kit": "^4.5.2",
-    "@valibot/to-json-schema": "^1.8.0",
     "jiti": "^2.7.0",
-    "pathe": "^2.0.3",
-    "zod-to-json-schema": "^3.25.2"
+    "pathe": "^2.0.3"
   },
   "devDependencies": {
     "@nuxt/devtools": "^3.4.2",
@@ -81,13 +79,21 @@
   },
   "peerDependencies": {
     "zod": "^3.25 || ^4.0.0",
-    "valibot": "^1.0.0"
+    "valibot": "^1.0.0",
+    "zod-to-json-schema": "^3.25.2",
+    "@valibot/to-json-schema": "^1.8.0"
   },
   "peerDependenciesMeta": {
     "zod": {
       "optional": true
     },
     "valibot": {
+      "optional": true
+    },
+    "zod-to-json-schema": {
+      "optional": true
+    },
+    "@valibot/to-json-schema": {
       "optional": true
     }
   }
