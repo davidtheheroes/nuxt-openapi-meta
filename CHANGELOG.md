@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 Releases use [changelogen](https://github.com/unjs/changelogen)
 with [Conventional Commits](https://www.conventionalcommits.org/).
 
+## v0.2.2
+
+[compare changes](https://github.com/davidtheheroes/nuxt-openapi-meta/compare/v0.2.1...v0.2.2)
+
+### 🚀 Enhancements
+
+- Add support security ([c821863](https://github.com/davidtheheroes/nuxt-openapi-meta/commit/c821863))
+
+### 📖 Documentation
+
+- Highlight @paramExample in v0.2.1 changelog ([cfd1849](https://github.com/davidtheheroes/nuxt-openapi-meta/commit/cfd1849))
+
+### ❤️ Contributors
+
+- David Pham ([@davidtheheroes](https://github.com/davidtheheroes))
+
 ## v0.2.1
 
 [compare changes](https://github.com/davidtheheroes/nuxt-openapi-meta/compare/v0.2.0...v0.2.1)
